@@ -1,0 +1,336 @@
+---
+title: "Derramamento de óleo Atlântico 2019"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(DT)
+library(readxl)
+library(ggplot2)
+library(plotly)
+library(googleway)
+library(readxl)
+
+
+branded_colors <- c(
+  "#00798c",
+  "#d1495b",
+  "#edae49",
+  "#66a182",
+  "#2e4057",
+  "#8d96a3",
+  "#c087ca",   # Roxo pastel
+  "#fbb07c",   # Laranja pastel
+  "#7fcfbf",   # Verde Azulado pastel
+  "#f88a60",   # Vermelho-alaranjado pastel
+  "#bfbfbf",   # Cinza original
+  "#d9d9d9"    # Cinza pastel
+)
+
+
+```
+
+
+```{r}
+#Carregando dados 
+dados_map <- read_xlsx("Mapa/locais_afetados.xlsx")
+
+```
+
+# Sumário {data-table=row}
+
+Column {data-width=250}
+-----------------------------------------------------------------------
+
+### Sobre
+
+No ano de 2019, houve um derramamento de óleo no atlântico sul e o material foi levado pelas correntes até o litoral brasileiro, passando a impactar diversos ecossistemas. Este derramamento foi considerado o maior evento em extensão ocorrido no atlântico sul, com aproximadamente ~5380 toneladas de material derramadas, chegando a afetar uma extensão de 2.890 km.
+
+Os dados apresentados, nessa página, acerca do derramamento de óleo foram obtidos a partir de informações apresentadas pelo IBAMA (Instituto Brasileiro do Meio Ambiente e dos Recursos Naturais Renováveis). Como órgão governamental responsável pela fiscalização e proteção ambiental, o IBAMA desempenha um papel crucial na coleta e análise de dados relacionados a incidentes ambientais. Com base nas informações aqui apresentadas, torna-se possível compreender a extensão dos danos causados pelo derramamento de óleo e os impactos sobre os ecossistemas costeiros e a fauna marinha.
+
+Mais informações: https://www.gov.br/ibama/pt-br/assuntos/fiscalizacao-e-protecao-ambiental/emergencias-ambientais/manchasdeoleo
+
+Column {data-width=250}
+-----------------------------------------------------------------------
+### Sumário
+```{r}
+localidade <-  length(unique(dados_map$localidade))
+valueBox(localidade,
+         icon = "fa-solid fa-magnifying-glass-location",
+         caption = "Localidades afetadas",
+         color = "#d1495b"
+         #color = "red"
+         )
+```
+
+### Articles per Day
+
+```{r}
+municipio <- length(unique(dados_map$municipio))
+valueBox(municipio, 
+         icon = "fa-solid fa-location-dot",
+         caption = "Municípios afetadas",
+          color ="#edae49")
+```
+
+### Comments per Day
+
+```{r}
+sigla_uf <- length(unique(dados_map$sigla_uf))
+valueBox(sigla_uf, 
+         icon = "fa-solid fa-map-location-dot",
+         caption = "Estados afetadas",
+         color = "#66a182")
+```
+
+### Spam per Day
+
+```{r}
+spam <- 5380
+valueBox(spam, 
+         icon = "fa-solid fa-droplet",
+         caption = "Toneladas de óleo derramadas",
+         color = "#2e4057"
+         )
+```
+
+
+
+Column {data-width=750}
+-----------------------------------------------------------------------
+
+### Localidades oleadas (IBAMA, última atualização: 19/03/2020)
+```{r}
+#Carregando pacotes
+library(googleway)
+library(readxl)
+
+#Carregando os dados e recursos
+dados_map <- read_xlsx("Mapa/locais_afetados.xlsx")
+api_key <- c("AIzaSyCO1kXag-sv5DND7Wz8tzmzNrfC51r5Z1g")
+
+dados_map$INFO <- paste0(dados_map$localidade, " | ", 
+                     dados_map$municipio, ", ", dados_map$sigla_uf)
+map <- google_map(
+  key = api_key,
+  width = "100%",
+  height = "100%",
+  data = dados_map
+)
+map %>%
+  add_markers(lat = "decimalLatitude", lon = "decimalLongitude",
+              mouse_over = "INFO")
+
+```
+
+
+### Quantidade de óleo derramado
+
+```{r}
+
+```
+
+
+Column {data-width=750}
+-----------------------------------------------------------------------
+
+### Dados das localidades oleadas (IBAMA, última atualização: 19/03/2020)
+```{r}
+dados_map <- read_xlsx("Mapa/locais_afetados.xlsx")
+dados_map_tab <- dados_map[,c(2,4,6,10,11)]
+
+datatable(
+    dados_map_tab, filter = 'top',
+    extensions = 'Buttons', 
+    #extensions = 'Responsive',
+    options = list(scrollX = TRUE
+                   , pageLength = 1009
+                   , dom = 'Blfrtip'
+                   ,buttons = c('copy', 'csv', 'excel', 'pdf', 'print',
+                                'colvis'))
+    )
+```
+
+
+# Publicações
+
+
+Row 
+-----------------------------------------------------------------------
+
+### Sobre as publicações
+
+Os dados aqui apresentados foram revisados por Alef Jonathan da Silva com última atualização em julho de 2023. As informações foram coletadas a partir de buscas na base de dados da Web of Science da seguinte forma: (oil spilled OR oil spill OR petroleum spilled OR petroleum spill) AND (Brazil OR brazilian OR coastal region of brazil OR coastal region of Brazilian). E posteriormente foram selecionados apenas os trabalhos que se referiam ao derramamento ocorrido em 2019 no atlântico sul e que atingiu o Brasil.
+
+
+
+Column {data-width=250}
+-----------------------------------------------------------------------
+### Sumário
+```{r}
+documentos <- 91
+valueBox(documentos, 
+         icon = "fa-solid fa-file-circle-check",
+         caption = "Publicações",
+         color = "#7fcfbf"
+         #color = "red"
+         )
+```
+
+### Articles per Day
+
+```{r}
+fontes <- 42
+valueBox(fontes, 
+         icon = "fa-regular fa-newspaper",
+         caption = "Fontes de publicações",
+          color ="#c087ca"
+         )
+```
+
+### Comments per Day
+
+```{r}
+autores <- 510
+valueBox(autores, 
+         icon = "fa-solid fa-people-group",
+         caption = "Autores participantes",
+         color = "#8d96a3"
+         )
+```
+
+### Spam per Day
+
+```{r}
+nacionalidade <- 17
+valueBox(nacionalidade, 
+         icon = "fa-solid fa-earth-americas",
+         caption = "Nacionalidade dos autores",
+         color = "#d9d9d9"
+         )
+```
+
+
+
+Column {data-length=600}
+-----------------------------------------------------------------------
+
+### Países com publicações e parcerias
+
+
+### Países com publicações e parcerias
+```{r}
+library(circlize)
+dados <- read.csv("Publicações/Conect_paises.csv", sep= ";", header=T)
+
+plottt <- function(data){
+chordDiagram(data, annotationTrack = "grid",
+             preAllocateTracks = 1,  annotationTrackHeight = c(0.03, 0.01))#annotationTrack =  c("name", "grid")
+
+circos.track(track.index = 1, panel.fun = function(x, y) {
+  circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index, 
+              facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5))
+}, bg.border = NA)
+}
+
+
+plottt(dados)
+
+```
+
+
+
+
+
+
+Row 
+-----------------------------------------------------------------------
+
+### Publicados em revistas científicas
+
+```{r}
+#{data-height=700}
+dados <- read_excel("data_oil.xlsx")
+dados2 <- dados[,c(1,38,2,24,46,13)]#6,
+
+datatable(
+    dados2, filter = 'top',
+    extensions = 'Buttons',
+    height = "100%",
+    #extensions = 'Responsive',
+    options = list(scrollX = TRUE
+                   , pageLength = 100
+                   , dom = 'Blfrtip'
+                   ,buttons = c('copy', 'csv', 'excel', 'pdf', 'print',
+                                'colvis'))
+    )
+```
+
+
+
+# Gráficos {data-table=row}
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Documentos científicos sobre o óleo
+
+```{r}
+
+
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Quantidade de óleo derramado
+
+```{r}
+
+
+#dados <- datasets::iris
+histograma = ggplot(data=iris,
+                    aes(x=Sepal.Length,fill=Species)) + 
+  geom_histogram() 
+ggplotly(histograma)
+
+```
+
+### Quantidade de trabalhos publicados
+
+```{r}
+
+dados <- read_excel("data_oil.xlsx")
+
+library(tidyverse)
+dados_plot <- dados %>% 
+  group_by(PY) %>% 
+  count() 
+
+library(ggplot2)
+plot_anos <- ggplot(dados_plot) +
+              aes(x = PY, weight = n, fill=as.factor(PY)) +
+              geom_bar() +
+              labs(y = "Número de trabalhos", x = "") +
+              theme_bw()+
+              scale_fill_manual(values = branded_colors)
+
+ggplotly(plot_anos)
+
+```
+
+
+
+
+
+# Terceira {data-table=row }
+
+
+
